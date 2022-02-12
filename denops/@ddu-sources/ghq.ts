@@ -1,8 +1,8 @@
 import * as fn from "https://deno.land/x/denops_std@v3.0.0/function/mod.ts";
-import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts";
-import type { GatherArguments } from "https://deno.land/x/ddu_vim@v0.7.0/base/source.ts";
-import type { Item } from "https://deno.land/x/ddu_vim@v0.7.0/types.ts";
-import { BaseSource } from "https://deno.land/x/ddu_vim@v0.7.0/types.ts";
+import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
+import type { GatherArguments } from "https://deno.land/x/ddu_vim@v0.12.2/base/source.ts";
+import type { Item } from "https://deno.land/x/ddu_vim@v0.12.2/types.ts";
+import { BaseSource } from "https://deno.land/x/ddu_vim@v0.12.2/types.ts";
 import { ensureString } from "https://deno.land/x/unknownutil@v1.1.4/mod.ts";
 import { basename } from "https://deno.land/std@0.125.0/path/mod.ts";
 
