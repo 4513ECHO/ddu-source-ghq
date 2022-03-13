@@ -35,6 +35,19 @@ EXAMPLES				*ddu-source-ghq-examples*
 >
 	" Use ghq source.
 	call ddu#start({'sources': [{'name': 'ghq'}]})
+	
+	" Set filepath for ghq.
+	call ddu#custom#patch_global('sourceParams', {
+	      \ 'ghq': {
+	      \   'bin': expand('~/.local/bin/ghq'),
+	      \ }})
+	
+	" Display as owner/repo style.
+	call ddu#custom#patch_global('sourceParams', {
+	      \ 'ghq': {
+	      \   'display': 'relative',
+	      \   'rootPath': expand('~/ghq/github.com'),
+	      \ }})
 <
 
 ==============================================================================
@@ -46,9 +59,16 @@ bin		string (default: "ghq")
 display		string (default: "raw")
 	Specify displayed paths mode. Following values are available:
 
-	"raw": raw path
-	"basename": basename of path
-	"shorten": shorten path like |pathshorten()|
+	value		description~
+	"raw"		raw path
+	"basename"	basename of path
+	"shorten"	shorten path like |pathshorten()|
+	"relative"	relative path from `rootPath`
+
+rootPath	string (default: `ghq root`)
+	Root path when `display` is "relative".
+
+	Note: multiple `ghq root` is not supported.
 
 ==============================================================================
 ABOUT					*ddu-source-ghq-about*

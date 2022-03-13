@@ -20,6 +20,13 @@ call ddu#start({'sources': [{'name': 'ghq'}]})
 " Set filepath for ghq.
 call ddu#custom#patch_global('sourceParams', {
       \ 'ghq': {
-      \   'bin': expand('~/.local/bin/ghq')
+      \   'bin': expand('~/.local/bin/ghq'),
+      \ }})
+
+" Display as owner/repo style.
+call ddu#custom#patch_global('sourceParams', {
+      \ 'ghq': {
+      \   'display': 'relative',
+      \   'rootPath': expand('~/ghq/github.com'),
       \ }})
 ```
