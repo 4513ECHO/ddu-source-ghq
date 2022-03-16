@@ -3,7 +3,7 @@
 Author: Hibiki <4513echo@gmail.com>
 License: MIT License
 URL: https://github.com/4513ECHO/ddu-source-ghq
-Last change: 2022 Jan 24
+Last change: 2022 Mar 16
 
 ==============================================================================
 CONTENTS				*ddu-source-ghq-contents*
