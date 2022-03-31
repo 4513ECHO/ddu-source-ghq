@@ -1,18 +1,47 @@
-import * as fn from "https://deno.land/x/denops_std@v3.1.4/function/mod.ts";
-import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.2.0/function/mod.ts";
+import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 import type {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddu_vim@v1.1.0/base/source.ts";
-import type { Item } from "https://deno.land/x/ddu_vim@v1.1.0/types.ts";
-import { BaseSource } from "https://deno.land/x/ddu_vim@v1.1.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.4.0/base/source.ts";
+import type {
+  Actions,
+  Item,
+} from "https://deno.land/x/ddu_vim@v1.4.0/types.ts";
+import {
+  ActionFlags,
+  BaseSource,
+} from "https://deno.land/x/ddu_vim@v1.4.0/types.ts";
 import { ensureString } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import { basename, relative } from "https://deno.land/std@0.127.0/path/mod.ts";
+import { basename, relative } from "https://deno.land/std@0.132.0/path/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v3.2.0/helper/mod.ts";
 
 interface Params {
   bin: string;
   display: "raw" | "basename" | "shorten" | "relative";
   rootPath: string;
+}
+
+async function runProcess(
+  args: { denops: Denops; sourceParams: Params },
+  subcmds: string[],
+): Promise<string> {
+  const proc = Deno.run({
+    cmd: [args.sourceParams.bin, ...subcmds],
+    stdin: "null",
+    stdout: "piped",
+    stderr: "piped",
+  });
+  if (!(await proc.status()).success) {
+    args.denops.call(
+      "ddu#util#print_error",
+      `Invalid bin param: ${args.sourceParams.bin}`,
+      new TextDecoder().decode(await proc.stderrOutput()),
+    );
+    proc.close();
+    return;
+  }
+  return new TextDecoder().decode(await proc.output());
 }
 
 export class Source extends BaseSource<Params, ActionData> {
@@ -21,7 +50,7 @@ export class Source extends BaseSource<Params, ActionData> {
 
   async onInit(args: OnInitArguments<Params>): Promise<void> {
     if (!args.sourceParams.rootPath) {
-      const output = await this.runProcess(args, ["root"]);
+      const output = await runProcess(args, ["root"]);
       this.rootPath = output.replace(/\r?\n/g, "");
     } else {
       this.rootPath = args.sourceParams.rootPath;
@@ -29,7 +58,7 @@ export class Source extends BaseSource<Params, ActionData> {
   }
 
   gather(args: GatherArguments<Params>): ReadableStream<Item<ActionData>[]> {
-    const { rootPath, runProcess, displayWord } = this;
+    const { rootPath, displayWord } = this;
     return new ReadableStream({
       async start(controller) {
         const output = await runProcess(args, ["list", "--full-path"]);
@@ -42,14 +71,29 @@ export class Source extends BaseSource<Params, ActionData> {
               display: display,
               action: {
                 path: i,
+                isDirectory: true,
               },
-            } as Item<ActionData>;
+            };
           })),
         );
         controller.close();
       },
     });
   }
+
+  actions: Actions<Params> = {
+    async create(args) {
+      const result = await input(args.denops, { prompt: "create: " });
+      if (!result) {
+        return Promise.resolve(ActionFlags.None);
+      }
+      await runProcess({
+        denops: args.denops,
+        sourceParams: args.sourceParams,
+      }, ["create", result]);
+      return Promise.resolve(ActionFlags.RefreshItems);
+    },
+  };
 
   params(): Params {
     return {
@@ -80,27 +124,5 @@ export class Source extends BaseSource<Params, ActionData> {
         );
         return item;
     }
-  }
-
-  private async runProcess(
-    args: { denops: Denops; sourceParams: Params },
-    subcmds: string[],
-  ): Promise<string> {
-    const proc = Deno.run({
-      cmd: [args.sourceParams.bin, ...subcmds],
-      stdin: "null",
-      stdout: "piped",
-      stderr: "piped",
-    });
-    if (!(await proc.status()).success) {
-      args.denops.call(
-        "ddu#util#print_error",
-        `Invalid bin param: ${args.sourceParams.bin}`,
-        new TextDecoder().decode(await proc.stderrOutput()),
-      );
-      proc.close();
-      return;
-    }
-    return new TextDecoder().decode(await proc.output());
   }
 }

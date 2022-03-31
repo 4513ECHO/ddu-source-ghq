@@ -1,8 +1,10 @@
 # ddu-source-ghq
 
-ghq source for ddu.vim
+ghq(1) source for ddu.vim
 
 This source collects repositories' paths listed by ghq.
+
+Please read [help](doc/ddu-source-ghq.txt) for details.
 
 ## Requirements
 
@@ -17,16 +19,18 @@ This source collects repositories' paths listed by ghq.
 " Use ghq source.
 call ddu#start({'sources': [{'name': 'ghq'}]})
 
-" Set filepath for ghq.
+" Set binary path for ghq.
 call ddu#custom#patch_global('sourceParams', {
       \ 'ghq': {
       \   'bin': expand('~/.local/bin/ghq'),
-      \ }})
+      \ },
+      \ })
 
 " Display as owner/repo style.
 call ddu#custom#patch_global('sourceParams', {
       \ 'ghq': {
       \   'display': 'relative',
       \   'rootPath': expand('~/ghq/github.com'),
-      \ }})
+      \ },
+      \ })
 ```
