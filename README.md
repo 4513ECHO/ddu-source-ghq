@@ -10,7 +10,7 @@ Please read [help](doc/ddu-source-ghq.txt) for details.
 
 - [ghq](https://github.com/x-motemen/ghq)
 - [denops.vim](https://github.com/vim-denops/denops.vim)
-- [ddu.vim](https://github.com/Shoguo/ddu.vim)
+- [ddu.vim](https://github.com/Shougo/ddu.vim)
 - [ddu-kind-file](https://github.com/Shougo/ddu-kind-file)
 
 ## Configuration
