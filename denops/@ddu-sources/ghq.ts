@@ -1,20 +1,20 @@
-import * as fn from "https://deno.land/x/denops_std@v3.2.0/function/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.3.2/function/mod.ts";
 import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 import type {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddu_vim@v1.4.0/base/source.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.7/base/source.ts";
 import type {
   Actions,
   Item,
-} from "https://deno.land/x/ddu_vim@v1.4.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.7/types.ts";
 import {
   ActionFlags,
   BaseSource,
-} from "https://deno.land/x/ddu_vim@v1.4.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.7/types.ts";
 import { ensureString } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import { basename, relative } from "https://deno.land/std@0.132.0/path/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v3.2.0/helper/mod.ts";
+import { basename, relative } from "https://deno.land/std@0.148.0/path/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v3.3.2/helper/mod.ts";
 
 interface Params {
   bin: string;
