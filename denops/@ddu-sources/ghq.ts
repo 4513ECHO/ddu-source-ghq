@@ -1,4 +1,3 @@
-import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.2/file.ts";
 import type {
@@ -13,6 +12,7 @@ import {
   ActionFlags,
   BaseSource,
 } from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
+import { pathshorten } from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import { basename, relative } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TextLineStream } from "https://deno.land/std@0.177.0/streams/text_line_stream.ts";
@@ -119,7 +119,7 @@ export class Source extends BaseSource<Params, ActionData> {
       case "basename":
         return basename(item);
       case "shorten":
-        return ensureString(await fn.pathshorten(args.denops, item));
+        return ensureString(await pathshorten(args.denops, item));
       case "relative":
         return relative(this.#rootPath, item);
       default:
