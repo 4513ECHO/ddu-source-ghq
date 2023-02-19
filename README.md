@@ -17,13 +17,11 @@ Please read [help](doc/ddu-source-ghq.txt) for details.
 
 ```vim
 " Use ghq source.
-call ddu#start({'sources': [{'name': 'ghq'}]})
+call ddu#start({ 'sources': [{ 'name': 'ghq' }] })
 
 " Set binary path for ghq.
 call ddu#custom#patch_global('sourceParams', {
-      \ 'ghq': {
-      \   'bin': expand('~/.local/bin/ghq'),
-      \ },
+      \ 'ghq': { 'bin': expand('~/.local/bin/ghq') },
       \ })
 
 " Display as owner/repo style.
