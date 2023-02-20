@@ -16,6 +16,7 @@ import { pathshorten } from "https://deno.land/x/denops_std@v4.0.0/function/mod.
 import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import { basename, relative } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TextLineStream } from "https://deno.land/std@0.177.0/streams/text_line_stream.ts";
+import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.1/mod.ts";
 import { input } from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 
 type Params = {
@@ -37,7 +38,6 @@ class EchomsgStream extends WritableStream<string> {
 export class Source extends BaseSource<Params, ActionData> {
   override kind = "file";
   #rootPath = "";
-  #buffer: Item<ActionData>[] = [];
 
   override async onInit(args: OnInitArguments<Params>): Promise<void> {
     if (!args.sourceParams.rootPath) {
@@ -54,12 +54,12 @@ export class Source extends BaseSource<Params, ActionData> {
   ): ReadableStream<Item<ActionData>[]> {
     return this.#runProcess(args, ["list", "--full-path"])
       .pipeThrough(
-        new TransformStream<string, Item<ActionData>[]>({
+        new TransformStream<string, Item<ActionData>>({
           transform: async (chunk, controller) => {
             if (!chunk.length) {
               return;
             }
-            this.#buffer.push({
+            controller.enqueue({
               word: chunk,
               display: await this.#displayWord(args, chunk),
               action: {
@@ -69,17 +69,10 @@ export class Source extends BaseSource<Params, ActionData> {
               treePath: chunk,
               isTree: true,
             });
-            if (this.#buffer.length > 1000) {
-              controller.enqueue(this.#buffer);
-              this.#buffer = [];
-            }
-          },
-          flush: (controller) => {
-            controller.enqueue(this.#buffer);
-            this.#buffer = [];
           },
         }),
-      );
+      )
+      .pipeThrough(new ChunkedStream({ chunkSize: 1000 }));
   }
 
   override actions: Actions<Params> = {
@@ -136,7 +129,7 @@ export class Source extends BaseSource<Params, ActionData> {
     args: { denops: Denops; sourceParams: Params },
     subcmds: string[],
   ): ReadableStream<string> {
-    const { stderr, stdout, status } = new Deno.Command(args.sourceParams.bin, {
+    const { status, stderr, stdout } = new Deno.Command(args.sourceParams.bin, {
       args: subcmds,
       stdin: "null",
       stderr: "piped",
