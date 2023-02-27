@@ -16,7 +16,7 @@ import { pathshorten } from "https://deno.land/x/denops_std@v4.0.0/function/mod.
 import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import { basename, relative } from "https://deno.land/std@0.177.0/path/mod.ts";
 import { TextLineStream } from "https://deno.land/std@0.177.0/streams/text_line_stream.ts";
-import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.1/mod.ts";
+import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.2/mod.ts";
 import { input } from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 
 type Params = {
@@ -37,12 +37,15 @@ class EchomsgStream extends WritableStream<string> {
 
 export class Source extends BaseSource<Params, ActionData> {
   override kind = "file";
+  #bin = "";
   #rootPath = "";
 
   override async onInit(args: OnInitArguments<Params>): Promise<void> {
+    this.#bin = args.sourceParams.bin;
     if (!args.sourceParams.rootPath) {
-      for await (const output of this.#runProcess(args, ["root"])) {
-        this.#rootPath = output.replace(/\r?\n/g, "");
+      for await (const path of this.#runProcess(args, ["root"])) {
+        this.#rootPath = path;
+        break;
       }
     } else {
       this.#rootPath = args.sourceParams.rootPath;
@@ -104,32 +107,32 @@ export class Source extends BaseSource<Params, ActionData> {
 
   async #displayWord(
     args: { denops: Denops; sourceParams: Params },
-    item: string,
+    word: string,
   ): Promise<string> {
     switch (args.sourceParams.display) {
       case "raw":
-        return item;
+        return word;
       case "basename":
-        return basename(item);
+        return basename(word);
       case "shorten":
-        return ensureString(await pathshorten(args.denops, item));
+        return ensureString(await pathshorten(args.denops, word));
       case "relative":
-        return relative(this.#rootPath, item);
+        return relative(this.#rootPath, word);
       default:
         await args.denops.call(
           "ddu#util#print_error",
           `Invalid display param: ${args.sourceParams.display}`,
           "ddu-source-ghq",
         );
-        return item;
+        return word;
     }
   }
 
   #runProcess(
-    args: { denops: Denops; sourceParams: Params },
+    args: { denops: Denops },
     subcmds: string[],
   ): ReadableStream<string> {
-    const { status, stderr, stdout } = new Deno.Command(args.sourceParams.bin, {
+    const { status, stderr, stdout } = new Deno.Command(this.#bin, {
       args: subcmds,
       stdin: "null",
       stderr: "piped",
