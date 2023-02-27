@@ -3,7 +3,7 @@
 Author: Hibiki <4513echo@gmail.com>
 License: MIT License
 URL: https://github.com/4513ECHO/ddu-source-ghq
-Last change: 2023 Feb 19
+Last change: 2023 Feb 27
 
 ==============================================================================
 CONTENTS					*ddu-source-ghq-contents*
@@ -80,12 +80,14 @@ ACTIONS						*ddu-source-ghq-actions*
 						*ddu-source-ghq-action-create*
 create
 	Create the new repository with asking prompt.
-	It is same as `ghq create` .
+	This action doesn't quit the ddu ui.
+	This action is same as "ghq create {repository}".
 
 						*ddu-source-ghq-action-get*
 get
 	Get the new repository with asking prompt.
-	It is same as `ghq get` .
+	This action doesn't quit the ddu ui.
+	This action is same as "ghq get {repository}".
 
 ==============================================================================
 ABOUT						*ddu-source-ghq-about*
