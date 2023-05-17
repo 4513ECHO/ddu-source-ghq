@@ -1,23 +1,22 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
-import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.2/file.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.3.3/mod.ts";
+import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.4.0/file.ts";
 import type {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddu_vim@v2.3.0/base/source.ts";
+} from "https://deno.land/x/ddu_vim@v2.8.4/base/source.ts";
 import type {
   Actions,
   Item,
-} from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
 import {
   ActionFlags,
   BaseSource,
-} from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
-import { pathshorten } from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import { basename, relative } from "https://deno.land/std@0.177.0/path/mod.ts";
-import { TextLineStream } from "https://deno.land/std@0.177.0/streams/text_line_stream.ts";
+} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
+import { pathshorten } from "https://deno.land/x/denops_std@v4.3.3/function/mod.ts";
+import { basename, relative } from "https://deno.land/std@0.187.0/path/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.187.0/streams/text_line_stream.ts";
 import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.2/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v4.3.3/helper/mod.ts";
 
 type Params = {
   bin: string;
@@ -115,7 +114,7 @@ export class Source extends BaseSource<Params, ActionData> {
       case "basename":
         return basename(word);
       case "shorten":
-        return ensureString(await pathshorten(args.denops, word));
+        return await pathshorten(args.denops, word);
       case "relative":
         return relative(this.#rootPath, word);
       default:
