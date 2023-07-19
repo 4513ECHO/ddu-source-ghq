@@ -1,24 +1,24 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.3.3/mod.ts";
-import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.4.0/file.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.5.3/file.ts";
 import type {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddu_vim@v2.8.4/base/source.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.3/base/source.ts";
 import type {
   Actions,
   Item,
-} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.3/types.ts";
 import {
   ActionFlags,
   BaseSource,
-} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
-import { pathshorten } from "https://deno.land/x/denops_std@v4.3.3/function/mod.ts";
-import { basename, relative } from "https://deno.land/std@0.187.0/path/mod.ts";
-import { TextLineStream } from "https://deno.land/std@0.187.0/streams/text_line_stream.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.3/types.ts";
+import { pathshorten } from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
+import { basename, relative } from "https://deno.land/std@0.194.0/path/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.194.0/streams/text_line_stream.ts";
 import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.2/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v4.3.3/helper/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 
-type Params = {
+export type Params = {
   bin: string;
   display: "raw" | "basename" | "shorten" | "relative";
   rootPath: string;
@@ -68,8 +68,6 @@ export class Source extends BaseSource<Params, ActionData> {
                 path: chunk,
                 isDirectory: true,
               },
-              treePath: chunk,
-              isTree: true,
             });
           },
         }),
