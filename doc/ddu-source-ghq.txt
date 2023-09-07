@@ -1,12 +1,12 @@
-*ddu-source-ghq.txt*				ghq source for ddu.vim
+*ddu-source-ghq.txt*                                 ghq(1) source for ddu.vim
 
 Author: Hibiki <mail@4513echo.dev>
 License: MIT License
 URL: https://github.com/4513ECHO/ddu-source-ghq
-Last change: 2023 May 16
+Last change: 2023 Sep 07
 
 ==============================================================================
-CONTENTS					*ddu-source-ghq-contents*
+CONTENTS                                             *ddu-source-ghq-contents*
 
 Introduction					|ddu-source-ghq-introdution|
 Install						|ddu-source-ghq-install|
@@ -16,14 +16,14 @@ Actions						|ddu-source-ghq-actions|
 About						|ddu-source-ghq-about|
 
 ==============================================================================
-INTRODUCTION					*ddu-source-ghq-introdution*
+INTRODUCTION                                      *ddu-source-ghq-introdution*
 
-This source collects repositories' paths listed by ghq.
+*ddu-source-ghq* is |ddu-sources| collecting repositories managed by ghq(1).
 
 ==============================================================================
-INSTALL						*ddu-source-ghq-install*
+INSTALL                                               *ddu-source-ghq-install*
 
-Please install  "ghq", "|ddu|.vim", "|denops.vim|" and "|ddu-kind-file|".
+Please install "ghq", "|ddu|.vim", "|denops.vim|" and "|ddu-kind-file|".
 
 https://github.com/x-motemen/ghq
 https://github.com/Shougo/ddu.vim
@@ -31,34 +31,20 @@ https://github.com/vim-denops/denops.vim
 https://github.com/Shougo/ddu-kind-file
 
 ==============================================================================
-EXAMPLES					*ddu-source-ghq-examples*
+EXAMPLES                                             *ddu-source-ghq-examples*
 
 >
 	" Use ghq source.
 	call ddu#start({ 'sources': [{ 'name': 'ghq' }] })
 
-	" Set binary path for ghq.
-	call ddu#custom#patch_global('sourceParams', {
-	      \ 'ghq': { 'bin': expand('~/.local/bin/ghq') },
-	      \ })
-
-	" Display as owner/repo style.
-	call ddu#custom#patch_global('sourceParams', {
-	      \ 'ghq': {
-	      \   'display': 'relative',
-	      \   'rootPath': expand('~/ghq/github.com'),
-	      \ },
-	      \ })
-<
-
 ==============================================================================
-PARAMS						*ddu-source-ghq-params*
+PARAMS                                                 *ddu-source-ghq-params*
 
-						*ddu-source-ghq-param-bin*
+                                                    *ddu-source-ghq-param-bin*
 bin		|String| (default: "ghq")
 	Filepath for the binary ghq.
 
-						*ddu-source-ghq-param-display*
+                                                *ddu-source-ghq-param-display*
 display		|String| (default: "raw")
 	Specify displayed paths mode. Following values are available:
 
@@ -68,32 +54,32 @@ display		|String| (default: "raw")
 	"shorten"	shortened path like |pathshorten()|
 	"relative"	relative path from `rootPath`
 
-						*ddu-source-ghq-param-rootPath*
+                                               *ddu-source-ghq-param-rootPath*
 rootPath	|String| (default: result of `ghq root`)
 	Root path when `display` is "relative".
 
 	NOTE: multiple `ghq root` is not supported.
 
 ==============================================================================
-ACTIONS						*ddu-source-ghq-actions*
+ACTIONS                                               *ddu-source-ghq-actions*
 
-						*ddu-source-ghq-action-create*
+                                                *ddu-source-ghq-action-create*
 create
 	Create the new repository with asking prompt.
 	This action doesn't quit the ddu ui.
 	This action is same as "ghq create {repository}".
 
-						*ddu-source-ghq-action-get*
+                                                   *ddu-source-ghq-action-get*
 get
 	Get the new repository with asking prompt.
 	This action doesn't quit the ddu ui.
 	This action is same as "ghq get {repository}".
 
 ==============================================================================
-ABOUT						*ddu-source-ghq-about*
+ABOUT                                                   *ddu-source-ghq-about*
 
-|ddu-source-ghq| is developed by Hibiki(4513ECHO) and licensed under
-the MIT License. Visit the project page for the latest version:
+|ddu-source-ghq| is developed by Hibiki(4513ECHO) and licensed under the MIT
+License. Visit the project page for the latest version:
 
 	https://github.com/4513ECHO/ddu-source-ghq
 
