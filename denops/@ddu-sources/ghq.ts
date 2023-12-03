@@ -1,38 +1,28 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.5.3/file.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.1.0/mod.ts";
+import type { ActionData } from "https://deno.land/x/ddu_kind_file@v0.7.1/file.ts";
 import type {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddu_vim@v3.4.3/base/source.ts";
+} from "https://deno.land/x/ddu_vim@v3.7.0/base/source.ts";
 import type {
   Actions,
   Item,
-} from "https://deno.land/x/ddu_vim@v3.4.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.7.0/types.ts";
 import {
   ActionFlags,
   BaseSource,
-} from "https://deno.land/x/ddu_vim@v3.4.3/types.ts";
-import { pathshorten } from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
-import { basename, relative } from "https://deno.land/std@0.194.0/path/mod.ts";
-import { TextLineStream } from "https://deno.land/std@0.194.0/streams/text_line_stream.ts";
+} from "https://deno.land/x/ddu_vim@v3.7.0/types.ts";
+import { pathshorten } from "https://deno.land/x/denops_std@v5.1.0/function/mod.ts";
+import { basename, relative } from "https://deno.land/std@0.208.0/path/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.208.0/streams/text_line_stream.ts";
 import { ChunkedStream } from "https://deno.land/x/chunked_stream@0.1.2/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v5.1.0/helper/mod.ts";
 
 export type Params = {
   bin: string;
   display: "raw" | "basename" | "shorten" | "relative";
   rootPath: string;
 };
-
-class EchomsgStream extends WritableStream<string> {
-  constructor(denops: Denops) {
-    super({
-      write: async (chunk, _controller) => {
-        await denops.cmd("echomsg '[ddu-source-ghq]' chunk", { chunk });
-      },
-    });
-  }
-}
 
 export class Source extends BaseSource<Params, ActionData> {
   override kind = "file";
@@ -42,10 +32,7 @@ export class Source extends BaseSource<Params, ActionData> {
   override async onInit(args: OnInitArguments<Params>): Promise<void> {
     this.#bin = args.sourceParams.bin;
     if (!args.sourceParams.rootPath) {
-      for await (const path of this.#runProcess(args, ["root"])) {
-        this.#rootPath = path;
-        break;
-      }
+      this.#rootPath = (await Array.fromAsync(this.#runProcess(["root"])))[0];
     } else {
       this.#rootPath = args.sourceParams.rootPath;
     }
@@ -54,7 +41,7 @@ export class Source extends BaseSource<Params, ActionData> {
   override gather(
     args: GatherArguments<Params>,
   ): ReadableStream<Item<ActionData>[]> {
-    return this.#runProcess(args, ["list", "--full-path"])
+    return this.#runProcess(["list", "--full-path"])
       .pipeThrough(
         new TransformStream<string, Item<ActionData>>({
           transform: async (chunk, controller) => {
@@ -81,7 +68,8 @@ export class Source extends BaseSource<Params, ActionData> {
       if (!result) {
         return Promise.resolve(ActionFlags.Persist);
       }
-      this.#runProcess(args, ["create", result]);
+      // NOTE: Wait until the process is finished.
+      await Array.fromAsync(this.#runProcess(["create", result]));
       return Promise.resolve(ActionFlags.RefreshItems);
     },
     get: async (args) => {
@@ -89,7 +77,8 @@ export class Source extends BaseSource<Params, ActionData> {
       if (!result) {
         return Promise.resolve(ActionFlags.Persist);
       }
-      this.#runProcess(args, ["get", result]);
+      // NOTE: Wait until the process is finished.
+      await Array.fromAsync(this.#runProcess(["get", result]));
       return Promise.resolve(ActionFlags.RefreshItems);
     },
   };
@@ -125,23 +114,23 @@ export class Source extends BaseSource<Params, ActionData> {
     }
   }
 
-  #runProcess(
-    args: { denops: Denops },
-    subcmds: string[],
-  ): ReadableStream<string> {
+  #runProcess(args: string[]): ReadableStream<string> {
     const { status, stderr, stdout } = new Deno.Command(this.#bin, {
-      args: subcmds,
+      args,
       stdin: "null",
       stderr: "piped",
       stdout: "piped",
     }).spawn();
-    status.then((status) => {
-      if (!status.success) {
+    status.then(async ({ success }) => {
+      if (success) {
+        return;
+      }
+      const lines = await Array.fromAsync(
         stderr
           .pipeThrough(new TextDecoderStream())
-          .pipeThrough(new TextLineStream())
-          .pipeTo(new EchomsgStream(args.denops));
-      }
+          .pipeThrough(new TextLineStream()),
+      );
+      throw new Error(lines.join("\n"));
     });
     return stdout
       .pipeThrough(new TextDecoderStream())
